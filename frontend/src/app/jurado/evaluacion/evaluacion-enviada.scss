@@ -1,0 +1,12 @@
+.pila-jurado { display: grid; gap: var(--espacio-4); }
+.titulo-proyecto { font-size: 16px; font-weight: 500; }
+.total { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--espacio-2); margin-bottom: var(--espacio-2);
+  strong { font-size: 36px; color: var(--color-primario); } }
+.lista-simple, .criterios { margin: 0; list-style: none; display: grid; gap: var(--espacio-2); }
+.lista-simple li { display: flex; align-items: center; gap: var(--espacio-2);
+  .mat-icon { color: var(--color-peligro); } .ok { color: var(--color-primario); } }
+.criterios li { display: flex; justify-content: space-between; gap: var(--espacio-3); padding-bottom: var(--espacio-2);
+  border-bottom: 1px solid var(--linea); font-size: 14px;
+  small { display: block; color: var(--texto-secundario); font-size: 12px; } strong { white-space: nowrap; color: var(--tabla-encabezado); } }
+h3 { margin: var(--espacio-3) 0 var(--espacio-1); font-size: 12px; text-transform: uppercase; color: var(--tabla-encabezado); }
+.observacion { margin: 0; white-space: pre-line; }

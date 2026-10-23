@@ -1,0 +1,92 @@
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+} @else if (!sel.activo()) {
+  <section class="tarjeta">
+    <h2 class="tarjeta__encabezado"><mat-icon>assignment_ind</mat-icon> Asignaciones</h2>
+    <div class="vacio"><mat-icon>event_busy</mat-icon>
+      <p>No hay un evento activo. Active uno en <a routerLink="/admin/eventos">Eventos</a> para asignar jurados.</p></div>
+  </section>
+} @else {
+  <section class="tarjeta">
+    <h2 class="tarjeta__encabezado"><mat-icon>assignment_ind</mat-icon> Jurados del evento activo</h2>
+    <p class="tarjeta__descripcion">
+      {{ sel.activo()!.nombre }}. Cada proyecto lleva dos jurados que se asignan juntos; cada docente tiene máximo 3 proyectos.
+    </p>
+    <div class="tarjeta__cuerpo">
+      <div class="barra-herramientas">
+        <mat-button-toggle-group [value]="vista()" (change)="vista.set($event.value)" hideSingleSelectionIndicator aria-label="Mostrar">
+          <mat-button-toggle value="TODOS">Todos ({{ proyectos().length }})</mat-button-toggle>
+          <mat-button-toggle value="SIN_JURADOS">Sin jurados ({{ sinJurados() }})</mat-button-toggle>
+          <mat-button-toggle value="CON_JURADOS">Con jurados ({{ proyectos().length - sinJurados() }})</mat-button-toggle>
+        </mat-button-toggle-group>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>Buscar</mat-label>
+          <input matInput [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" placeholder="Código, título o jurado" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+      @if (sinJurados() * 2 > cupoLibre()) {
+        <p class="aviso"><mat-icon>warning</mat-icon>
+          <span>Faltan jurados: se necesitan {{ sinJurados() * 2 }} cupos y los docentes tienen {{ cupoLibre() }} libres.
+            <a routerLink="/admin/docentes">Registre más docentes</a>.</span></p>
+      }
+      @if (!proyectos().length) {
+        <div class="vacio"><mat-icon>post_add</mat-icon><p>No hay proyectos en el evento activo.</p></div>
+      }
+      <div class="lista-asignaciones">
+        @for (p of visibles(); track p.id) {
+          <article class="asignacion" [class.asignacion--sin]="!p.jurados.length">
+            <header class="asignacion__cabecera">
+              <div>
+                <strong>{{ p.codigo }}</strong> · {{ p.titulo }}
+                <div class="texto-secundario">{{ p.tipo }} · {{ p.origen === 'SEMILLERO' ? 'Semillero' : 'Trabajo de grado' }} · {{ p.area.nombre }}</div>
+              </div>
+              <app-estado-chip [estado]="p.estado_evaluacion" />
+            </header>
+
+            @if (!p.jurados.length) {
+              <div class="asignacion__seleccion">
+                @for (pos of [0, 1]; track pos) {
+                  <mat-form-field subscriptSizing="dynamic">
+                    <mat-label>Jurado {{ pos + 1 }}</mat-label>
+                    <mat-select [value]="elegido(p.id, $any(pos))" (valueChange)="elegir(p.id, $any(pos), $event)">
+                      @for (d of docentesOrdenados(); track d.id) {
+                        <mat-option [value]="d.id"
+                                    [disabled]="d.asignados >= d.max_asignaciones || elegido(p.id, $any(1 - pos)) === d.id">
+                          {{ d.nombre_completo }} ({{ d.asignados }}/{{ d.max_asignaciones }})
+                        </mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                }
+                <button mat-flat-button (click)="asignar(p)" [disabled]="!listo(p.id) || guardando() === p.id">
+                  <mat-icon>how_to_reg</mat-icon> Asignar los dos
+                </button>
+              </div>
+            } @else {
+              <div class="asignacion__jurados">
+                @for (j of p.jurados; track j.asignacion_id; let i = $index) {
+                  <div class="jurado">
+                    <span class="jurado__numero">{{ i + 1 }}</span>
+                    <span class="jurado__nombre">{{ j.nombre_completo }}</span>
+                    @if (j.evaluada) {
+                      <app-estado-chip estado="ENVIADA" texto="Evaluó" />
+                    } @else {
+                      <button mat-button (click)="cambiar(p, j)"><mat-icon>swap_horiz</mat-icon> Cambiar</button>
+                    }
+                  </div>
+                }
+                <button mat-button class="boton-peligro" (click)="quitar(p)" [disabled]="algunoEvaluo(p)" disabledInteractive
+                        [matTooltip]="algunoEvaluo(p) ? 'Un jurado ya evaluó: solo puede cambiar al que no ha evaluado' : ''">
+                  <mat-icon>person_remove</mat-icon> Quitar ambos
+                </button>
+              </div>
+            }
+          </article>
+        } @empty {
+          @if (proyectos().length) { <p class="vacio">Ningún proyecto coincide.</p> }
+        }
+      </div>
+    </div>
+  </section>
+}

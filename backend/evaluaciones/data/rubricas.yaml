@@ -1,0 +1,203 @@
+niveles: [Insuficiente, Básico, Bueno, Sobresaliente]
+
+notas_estado:
+  INV:
+    EN_CURSO: "En los criterios 3 y 4, valore el diseño en ejecución y los avances obtenidos a la fecha, no el trabajo terminado."
+  DTI:
+    EN_CURSO: "En los criterios 3 y 4, valore el enfoque en desarrollo y la madurez alcanzada a la fecha, no el desarrollo concluido."
+
+asistencia_alguno: "Si al menos un ponente se presentó, evalúe el proyecto completo. Los ponentes ausentes no reciben certificado de ponente, y ello no afecta la calificación del proyecto ni los certificados de los demás."
+
+asistencia_ninguno: "Si ningún ponente se presentó, califique los criterios 1 a 6; el criterio 7 queda en 0 y la evaluación se registra como «sin sustentación». El proyecto no aspira a los reconocimientos."
+
+umbrales:
+  reconocimiento: 80
+  mencion_meritoria: 85
+
+texto_umbrales: "Umbral de reconocimiento: 80 puntos. Mención meritoria: 85 puntos."
+
+INV:
+  - orden: 1
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Planteamiento del problema, objetivos y pertinencia"
+      descriptores:
+        - "Problema difuso; objetivos ausentes o incoherentes con él"
+        - "Problema enunciado; objetivos vagos o sin relación clara"
+        - "Problema delimitado; objetivos precisos y coherentes"
+        - "Problema delimitado y pertinente; objetivos precisos y verificables"
+  - orden: 2
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Antecedentes"
+      descriptores:
+        - "Sin antecedentes, o ajenos al problema planteado"
+        - "Menciona fuentes aisladas, sin relación entre sí"
+        - "Revisión pertinente y actualizada, dentro de los 5 años"
+        - "Revisión pertinente que sitúa el vacío que el proyecto aborda"
+  - orden: 3
+    puntajes: [0, 7, 13, 20]
+    BASE:
+      nombre: "Rigor metodológico"
+      descriptores:
+        - "Metodología ausente o que no corresponde al problema"
+        - "Metodología enunciada, sin instrumentos ni técnicas de análisis"
+        - "Metodología completa y coherente con el problema"
+        - "Metodología completa, coherente y justificada frente a alternativas"
+    EN_CURSO:
+      nombre: "Diseño en ejecución"
+      descriptores:
+        - "Metodología ausente o que no corresponde al problema"
+        - "Metodología enunciada, sin instrumentos ni técnicas de análisis"
+        - "Metodología completa y coherente con el problema"
+        - "Metodología completa, coherente y justificada frente a alternativas"
+  - orden: 4
+    puntajes: [0, 3, 7, 10]
+    BASE:
+      nombre: "Resultados y avances"
+      descriptores:
+        - "Sin resultados ni avances declarados"
+        - "Resultados enunciados, sin datos ni evidencia"
+        - "Resultados presentados con evidencia suficiente"
+        - "Resultados presentados, con evidencia y análisis"
+    PROPUESTA:
+      nombre: "Resultados esperados y viabilidad"
+      descriptores:
+        - "Sin plan de trabajo ni resultados esperados"
+        - "Plan enunciado, sin fases ni recursos"
+        - "Plan con fases y recursos definidos"
+        - "Plan con fases, recursos y riesgos previstos"
+    EN_CURSO:
+      nombre: "Avances obtenidos hasta la fecha"
+      descriptores:
+        - "Sin plan de trabajo ni resultados esperados"
+        - "Plan enunciado, sin fases ni recursos"
+        - "Plan con fases y recursos definidos"
+        - "Plan con fases, recursos y riesgos previstos"
+  - orden: 5
+    puntajes: [0, 3, 7, 10]
+    BASE:
+      nombre: "Conclusiones y trabajo futuro"
+      descriptores:
+        - "Ausentes o sin relación con los resultados"
+        - "Enunciadas, sin sustento en los resultados"
+        - "Derivadas de los resultados, sin proyección"
+        - "Derivadas de los resultados, con líneas de continuidad claras"
+    PROPUESTA:
+      nombre: "Aportes previstos y trabajo futuro"
+      descriptores:
+        - "Sin aportes previstos ni siguientes pasos"
+        - "Aportes enunciados de forma general"
+        - "Aportes previstos coherentes con los objetivos"
+        - "Aportes previstos coherentes, con siguientes pasos definidos"
+  - orden: 6
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Calidad del póster"
+      descriptores:
+        - "Ilegible a un metro, o incumple la plantilla institucional"
+        - "Legible, pero sobrecargado o con bloques incompletos"
+        - "Legible, ordenado y conforme a la plantilla"
+        - "Legible, ordenado, con figuras que aportan al contenido"
+  - orden: 7
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Sustentación"
+      descriptores:
+        - "No sustenta, o no domina el proyecto que presenta"
+        - "Expone con dificultad; responde parcialmente las preguntas"
+        - "Expone con claridad y responde las preguntas"
+        - "Expone con claridad, domina el tema y argumenta sus respuestas"
+
+DTI:
+  - orden: 1
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Reto tecnológico, objetivos y pertinencia"
+      descriptores:
+        - "Reto difuso; objetivos ausentes o incoherentes con él"
+        - "Reto enunciado; objetivos vagos o sin relación clara"
+        - "Reto delimitado; objetivos precisos y coherentes"
+        - "Reto delimitado y pertinente; objetivos precisos y verificables"
+  - orden: 2
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Soluciones existentes y grado de novedad"
+      descriptores:
+        - "Sin revisión de soluciones existentes"
+        - "Menciona soluciones aisladas, sin comparación"
+        - "Revisión pertinente y actualizada, dentro de los 5 años"
+        - "Revisión pertinente que sustenta el grado de novedad de la propuesta"
+  - orden: 3
+    puntajes: [0, 7, 13, 20]
+    BASE:
+      nombre: "Enfoque técnico"
+      descriptores:
+        - "Enfoque ausente o que no corresponde al reto planteado"
+        - "Enfoque enunciado, sin componentes ni tecnologías definidas"
+        - "Arquitectura completa y coherente con el reto"
+        - "Arquitectura completa, coherente y justificada frente a alternativas"
+    EN_CURSO:
+      nombre: "Enfoque en desarrollo, no el desarrollo concluido"
+      descriptores:
+        - "Enfoque ausente o que no corresponde al reto planteado"
+        - "Enfoque enunciado, sin componentes ni tecnologías definidas"
+        - "Arquitectura completa y coherente con el reto"
+        - "Arquitectura completa, coherente y justificada frente a alternativas"
+  - orden: 4
+    puntajes: [0, 3, 7, 10]
+    BASE:
+      nombre: "Nivel de madurez"
+      descriptores:
+        - "Sin evidencia de avance del desarrollo"
+        - "Avance declarado, sin evidencia que lo respalde"
+        - "Nivel de madurez declarado y evidenciado"
+        - "Nivel de madurez evidenciado y validado"
+    PROPUESTA:
+      nombre: "Madurez esperada y viabilidad"
+      descriptores:
+        - "Sin plan de desarrollo ni madurez esperada"
+        - "Plan enunciado, sin fases ni recursos"
+        - "Plan con fases y recursos definidos"
+        - "Plan con fases, recursos y riesgos previstos"
+    EN_CURSO:
+      nombre: "Madurez alcanzada a la fecha, no el desarrollo concluido"
+      descriptores:
+        - "Sin plan de desarrollo ni madurez esperada"
+        - "Plan enunciado, sin fases ni recursos"
+        - "Plan con fases y recursos definidos"
+        - "Plan con fases, recursos y riesgos previstos"
+  - orden: 5
+    puntajes: [0, 3, 7, 10]
+    BASE:
+      nombre: "Aplicabilidad y transferencia"
+      descriptores:
+        - "Sin aplicación identificada"
+        - "Aplicación enunciada de forma general"
+        - "Aplicación concreta identificada, con usuario o contexto"
+        - "Aplicación concreta con ruta de transferencia definida"
+    PROPUESTA:
+      nombre: "Aplicabilidad prevista y trabajo futuro"
+      descriptores:
+        - "Sin aplicación prevista"
+        - "Aplicación enunciada de forma general"
+        - "Aplicación prevista con usuario o contexto identificado"
+        - "Aplicación prevista con ruta de continuidad definida"
+  - orden: 6
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Calidad del póster"
+      descriptores:
+        - "Ilegible a un metro, o incumple la plantilla institucional"
+        - "Legible, pero sobrecargado o con bloques incompletos"
+        - "Legible, ordenado y conforme a la plantilla"
+        - "Legible, ordenado, con figuras que aportan al contenido"
+  - orden: 7
+    puntajes: [0, 5, 10, 15]
+    BASE:
+      nombre: "Sustentación"
+      descriptores:
+        - "No sustenta, o no domina el proyecto que presenta"
+        - "Expone con dificultad; responde parcialmente las preguntas"
+        - "Expone con claridad y responde las preguntas"
+        - "Expone con claridad, domina el tema y argumenta sus respuestas"

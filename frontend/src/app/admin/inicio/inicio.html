@@ -1,0 +1,68 @@
+<div class="barra-herramientas">
+  <app-selector-evento />
+</div>
+
+@if (sel.cargados() && !sel.eventos().length) {
+  <section class="tarjeta">
+    <h2 class="tarjeta__encabezado"><mat-icon>event</mat-icon> Comience creando el evento</h2>
+    <p class="tarjeta__descripcion">Todavía no hay eventos registrados.</p>
+    <div class="vacio">
+      <mat-icon>event_available</mat-icon>
+      <p>Cree el evento y actívelo; luego registre docentes y proyectos.</p>
+      <a mat-flat-button routerLink="/admin/eventos"><mat-icon>add</mat-icon> Crear evento</a>
+    </div>
+  </section>
+} @else if (resumen(); as r) {
+  @if (!r.evento.activo) {
+    <p class="aviso"><mat-icon>info</mat-icon> Está consultando un evento que no es el activo. Los jurados solo ven el evento activo.</p>
+  }
+  <div class="pila">
+    <section class="tarjeta destacado">
+      <h2 class="tarjeta__encabezado"><mat-icon>pending_actions</mat-icon> Proyectos que faltan por evaluar</h2>
+      <p class="tarjeta__descripcion">{{ r.evento.nombre }}</p>
+      <div class="tarjeta__cuerpo destacado__cuerpo">
+        <div class="destacado__cifra" [class.destacado__cifra--listo]="faltan() === 0 && r.total_proyectos > 0">
+          <strong>{{ faltan() }}</strong>
+          <span>de {{ r.total_proyectos }} proyectos</span>
+        </div>
+        <div class="destacado__detalle">
+          @if (r.total_proyectos === 0) {
+            <p>Aún no hay proyectos registrados en este evento.</p>
+            <a mat-stroked-button routerLink="/admin/proyectos/nuevo"><mat-icon>post_add</mat-icon> Registrar proyecto</a>
+          } @else if (faltan() === 0) {
+            <p><mat-icon class="ok">task_alt</mat-icon> Todos los proyectos tienen sus dos evaluaciones.</p>
+            <a mat-flat-button routerLink="/admin/resultados"><mat-icon>emoji_events</mat-icon> Ver resultados</a>
+          } @else {
+            <p>Evaluaciones enviadas: <strong>{{ r.evaluaciones_enviadas }} de {{ r.evaluaciones_total }}</strong>
+              ({{ porcentaje() | number: '1.0-0' }} %)</p>
+            <mat-progress-bar mode="determinate" [value]="porcentaje()" aria-label="Progreso de evaluaciones" />
+            <a mat-stroked-button routerLink="/admin/proyectos" [queryParams]="{ estado_evaluacion: 'FALTAN' }">
+              <mat-icon>list_alt</mat-icon> Ver cuáles faltan
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+
+    <div class="cifras">
+      @for (t of tarjetas(); track t.estado) {
+        <a class="cifra" [class]="'cifra cifra--' + t.clase" routerLink="/admin/proyectos" [queryParams]="{ estado_evaluacion: t.estado }">
+          <mat-icon>{{ t.icono }}</mat-icon>
+          <strong>{{ t.valor }}</strong>
+          <span class="cifra__texto">{{ t.texto }}</span>
+          <span class="cifra__ayuda">{{ t.ayuda }}</span>
+        </a>
+      }
+    </div>
+
+    @if (r.sin_jurados > 0) {
+      <p class="aviso">
+        <mat-icon>warning</mat-icon>
+        <span>Hay <strong>{{ r.sin_jurados }}</strong> {{ r.sin_jurados === 1 ? 'proyecto' : 'proyectos' }} sin jurados.
+          <a routerLink="/admin/asignaciones">Asignarlos ahora</a>.</span>
+      </p>
+    }
+  </div>
+} @else if (cargando()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+}

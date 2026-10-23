@@ -1,0 +1,117 @@
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+} @else {
+<form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <section class="tarjeta">
+    <h2 class="tarjeta__encabezado"><mat-icon>{{ proyecto() ? 'edit_note' : 'post_add' }}</mat-icon>
+      {{ proyecto() ? 'Proyecto ' + proyecto()!.codigo : 'Datos del proyecto' }}</h2>
+    <p class="tarjeta__descripcion">Todos los campos son obligatorios. El programa académico se deriva del área.</p>
+    <div class="tarjeta__cuerpo">
+      @if (bloqueado()) {
+        <p class="aviso"><mat-icon>lock</mat-icon>
+          <span>Este proyecto ya tiene evaluaciones enviadas. Solo se pueden corregir el código, el título, el área y el
+            nombre o la cédula de los autores. El evento, el origen, el tipo, el estado y la cantidad de autores quedan fijos.</span></p>
+      }
+      <div class="campos">
+        <mat-form-field class="ancho">
+          <mat-label>Evento</mat-label>
+          <mat-select formControlName="evento">
+            @for (e of sel.eventos(); track e.id) { <mat-option [value]="e.id">{{ e.nombre }}{{ e.activo ? ' (activo)' : '' }}</mat-option> }
+          </mat-select>
+          <mat-error>Elija el evento.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Código</mat-label>
+          <input matInput formControlName="codigo" />
+          @if (errores()['codigo']) { <mat-hint class="hint-error">{{ errores()['codigo'] }}</mat-hint> }
+          <mat-error>Escriba el código.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="ancho">
+          <mat-label>Título del proyecto</mat-label>
+          <textarea matInput formControlName="titulo" rows="2"></textarea>
+          <mat-error>Escriba el título.</mat-error>
+        </mat-form-field>
+        <mat-form-field class="ancho" subscriptSizing="dynamic">
+          <mat-label>Área de conocimiento</mat-label>
+          <mat-select formControlName="area">
+            @for (g of areas(); track g.programa) {
+              <mat-optgroup [label]="g.programa_nombre">
+                @for (a of g.areas; track a.id) { <mat-option [value]="a.id">{{ a.nombre }}</mat-option> }
+              </mat-optgroup>
+            }
+          </mat-select>
+          @if (programa()) { <mat-hint>Programa: {{ programa() }}</mat-hint> }
+          <mat-error>Elija el área.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Origen</mat-label>
+          <mat-select formControlName="origen">
+            @for (o of origenes; track o.valor) { <mat-option [value]="o.valor">{{ o.texto }}</mat-option> }
+          </mat-select>
+          <mat-error>Elija el origen.</mat-error>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-label>Estado del proyecto</mat-label>
+          <mat-select formControlName="estado">
+            @for (e of estados; track e.valor) {
+              <mat-option [value]="e.valor" [disabled]="e.valor === 'PROPUESTA' && esTrabajoGrado()">
+                {{ e.texto }}{{ e.valor === 'PROPUESTA' && esTrabajoGrado() ? ' (no aplica a trabajo de grado)' : '' }}
+              </mat-option>
+            }
+          </mat-select>
+          @if (esTrabajoGrado()) { <mat-hint>Un trabajo de grado no puede estar en Propuesta.</mat-hint> }
+          @if (errores()['estado']) { <mat-hint class="hint-error">{{ errores()['estado'] }}</mat-hint> }
+          <mat-error>Elija el estado.</mat-error>
+        </mat-form-field>
+        <div class="ancho">
+          <span class="etiqueta">Tipo (define la rúbrica)</span>
+          <mat-radio-group formControlName="tipo" class="radios">
+            @for (t of tipos; track t.valor) { <mat-radio-button [value]="t.valor">{{ t.texto }}</mat-radio-button> }
+          </mat-radio-group>
+          @if (form.controls.tipo.touched && form.controls.tipo.invalid) { <p class="error-campo">Elija el tipo.</p> }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tarjeta">
+    <h2 class="tarjeta__encabezado"><mat-icon>group</mat-icon> Autores ({{ autores.length }} de {{ maxAutores }})</h2>
+    <p class="tarjeta__descripcion">Entre 1 y 5 autores. El jurado marcará la asistencia de cada uno.</p>
+    <div class="tarjeta__cuerpo" formArrayName="autores">
+      @if (errores()['autores']) { <p class="error-campo">{{ errores()['autores'] }}</p> }
+      @for (autor of autores.controls; track autor; let i = $index) {
+        <div class="autor" [formGroupName]="i">
+          <span class="autor__numero">{{ i + 1 }}</span>
+          <mat-form-field>
+            <mat-label>Nombre completo</mat-label>
+            <input matInput formControlName="nombre_completo" />
+            <mat-error>{{ erroresAutores()[i]?.['nombre_completo'] || 'Escriba el nombre.' }}</mat-error>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Cédula</mat-label>
+            <input matInput formControlName="cedula" inputmode="numeric" />
+            @if (erroresAutores()[i]?.['cedula']) { <mat-hint class="hint-error">{{ erroresAutores()[i]['cedula'] }}</mat-hint> }
+            <mat-error>Solo números o letras, sin puntos.</mat-error>
+          </mat-form-field>
+          @if (!bloqueado()) {
+            <button mat-icon-button type="button" class="boton-peligro" (click)="quitarAutor(i)" [disabled]="autores.length === 1"
+                    aria-label="Quitar autor"><mat-icon>delete</mat-icon></button>
+          }
+        </div>
+      }
+      @if (!bloqueado() && autores.length < maxAutores) {
+        <button mat-stroked-button type="button" (click)="agregarAutor()"><mat-icon>person_add</mat-icon> Agregar autor</button>
+      }
+    </div>
+    <div class="tarjeta__acciones">
+      <a mat-stroked-button routerLink="/admin/proyectos"><mat-icon>close</mat-icon> Cancelar</a>
+      @if (!proyecto()) {
+        <button mat-stroked-button type="button" (click)="guardar(true)" [disabled]="enviando()">
+          <mat-icon>playlist_add</mat-icon> Guardar y registrar otro
+        </button>
+      }
+      <button mat-flat-button type="submit" [disabled]="enviando()"><mat-icon>save</mat-icon> Guardar proyecto</button>
+    </div>
+  </section>
+</form>
+}

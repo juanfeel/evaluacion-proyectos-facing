@@ -1,0 +1,71 @@
+<section class="tarjeta">
+  <h2 class="tarjeta__encabezado"><mat-icon>emoji_events</mat-icon> Resultados</h2>
+  <p class="tarjeta__descripcion">
+    Promedio de las dos evaluaciones.
+    @if (resultados()?.umbrales; as u) { Reconocimiento desde {{ u.reconocimiento }}; mención meritoria desde {{ u.mencion_meritoria }}. }
+    Toque una fila para ver las evaluaciones.
+  </p>
+  <div class="tarjeta__cuerpo">
+    <div class="barra-herramientas"><app-selector-evento /></div>
+    @if (cargando()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+    } @else if (!sel.eventos().length) {
+      <div class="vacio"><mat-icon>event</mat-icon><p>No hay eventos registrados.</p></div>
+    } @else {
+      <mat-tab-group mat-stretch-tabs="false" animationDuration="150ms">
+        @for (t of tablas(); track t.nombre) {
+          <mat-tab [label]="t.nombre + ' (' + t.evaluados + '/' + t.proyectos.length + ')'">
+            @if (!t.proyectos.length) {
+              <div class="vacio"><mat-icon>inbox</mat-icon><p>No hay proyectos en esta categoría.</p></div>
+            } @else {
+              <div class="tabla-contenedor">
+                <table mat-table [dataSource]="t.proyectos">
+                  <ng-container matColumnDef="puesto">
+                    <th mat-header-cell *matHeaderCellDef>Puesto</th>
+                    <td mat-cell *matCellDef="let f">
+                      @if (f.puesto) { <span class="puesto" [class.puesto--podio]="f.puesto <= 3">{{ f.puesto }}</span> } @else { — }
+                    </td>
+                  </ng-container>
+                  <ng-container matColumnDef="codigo">
+                    <th mat-header-cell *matHeaderCellDef>Código</th>
+                    <td mat-cell *matCellDef="let f"><strong>{{ f.codigo }}</strong></td>
+                  </ng-container>
+                  <ng-container matColumnDef="titulo">
+                    <th mat-header-cell *matHeaderCellDef>Título</th>
+                    <td mat-cell *matCellDef="let f">{{ f.titulo }}<div class="texto-secundario">{{ f.programa }} · {{ f.area }}</div></td>
+                  </ng-container>
+                  <ng-container matColumnDef="nota1">
+                    <th mat-header-cell *matHeaderCellDef>Jurado 1</th>
+                    <td mat-cell *matCellDef="let f" class="num">{{ f.nota_jurado_1 ?? '—' }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="nota2">
+                    <th mat-header-cell *matHeaderCellDef>Jurado 2</th>
+                    <td mat-cell *matCellDef="let f" class="num">{{ f.nota_jurado_2 ?? '—' }}</td>
+                  </ng-container>
+                  <ng-container matColumnDef="promedio">
+                    <th mat-header-cell *matHeaderCellDef>Promedio</th>
+                    <td mat-cell *matCellDef="let f" class="num"><strong class="promedio">{{ f.promedio ?? '—' }}</strong></td>
+                  </ng-container>
+                  <ng-container matColumnDef="indicadores">
+                    <th mat-header-cell *matHeaderCellDef>Indicadores</th>
+                    <td mat-cell *matCellDef="let f">
+                      <div class="indicadores">
+                        @if (f.pendiente) { <app-estado-chip estado="PENDIENTE" [texto]="'Pendiente ' + f.evaluaciones_enviadas + '/2'" /> }
+                        @if (f.mencion_meritoria) { <app-estado-chip estado="MENCION" /> }
+                        @if (f.reconocimiento) { <app-estado-chip estado="RECONOCIMIENTO" /> }
+                        @if (f.sin_sustentacion) { <app-estado-chip estado="SIN_SUSTENTACION" /> }
+                      </div>
+                    </td>
+                  </ng-container>
+                  <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+                  <tr mat-row *matRowDef="let f; columns: columnas" class="fila-clic" [class.fila-pendiente]="f.pendiente"
+                      (click)="verDetalle(f)" (keydown.enter)="verDetalle(f)" tabindex="0"></tr>
+                </table>
+              </div>
+            }
+          </mat-tab>
+        }
+      </mat-tab-group>
+    }
+  </div>
+</section>

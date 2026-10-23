@@ -1,0 +1,11 @@
+<main class="estado">
+  <h1>Evaluación de Proyectos · FACING</h1>
+  @if (health(); as h) {
+    <p>API: <strong>{{ h.ok ? 'ok' : 'error' }}</strong></p>
+    <p>db: <strong>{{ h.db }}</strong></p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else {
+    <p>Consultando el servidor…</p>
+  }
+</main>

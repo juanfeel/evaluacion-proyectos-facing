@@ -1,0 +1,8 @@
+.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.promedio { font-size: 16px; color: var(--tabla-encabezado); }
+.puesto { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--tarjeta-descripcion); font-weight: 700; }
+.puesto--podio { background: var(--franja-ambar); color: var(--franja-texto-ambar); }
+.indicadores { display: flex; flex-wrap: wrap; gap: var(--espacio-1); }
+.fila-clic { cursor: pointer; &:hover, &:focus-visible { background: var(--fondo-pagina); outline: none; } }
+.fila-pendiente td { color: var(--texto-secundario); }

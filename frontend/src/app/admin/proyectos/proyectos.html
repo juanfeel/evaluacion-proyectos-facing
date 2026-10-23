@@ -1,0 +1,111 @@
+<section class="tarjeta">
+  <h2 class="tarjeta__encabezado"><mat-icon>list_alt</mat-icon> Proyectos</h2>
+  <p class="tarjeta__descripcion">El estado de evaluación muestra cuáles faltan por evaluar y cuáles no tienen jurados.</p>
+  <div class="tarjeta__cuerpo">
+    <div class="barra-herramientas">
+      <app-selector-evento />
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Estado de evaluación</mat-label>
+        <mat-select [value]="estado()" (valueChange)="estado.set($event)">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="FALTAN">Faltan por evaluar</mat-option>
+          @for (e of estadosEvaluacion; track e.valor) { <mat-option [value]="e.valor">{{ e.texto }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Origen</mat-label>
+        <mat-select [value]="origen()" (valueChange)="origen.set($event)">
+          <mat-option value="">Todos</mat-option>
+          @for (o of origenes; track o.valor) { <mat-option [value]="o.valor">{{ o.texto }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Tipo</mat-label>
+        <mat-select [value]="tipo()" (valueChange)="tipo.set($event)">
+          <mat-option value="">Todos</mat-option>
+          <mat-option value="INV">INV</mat-option>
+          <mat-option value="DTI">DTI</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field subscriptSizing="dynamic">
+        <mat-label>Buscar</mat-label>
+        <input matInput [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" placeholder="Código o título" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      @if (hayFiltros()) {
+        <button mat-button (click)="limpiar()"><mat-icon>filter_alt_off</mat-icon> Quitar filtros</button>
+      }
+      <span class="barra-herramientas__espacio"></span>
+      <a mat-flat-button routerLink="/admin/proyectos/nuevo"><mat-icon>post_add</mat-icon> Registrar proyecto</a>
+    </div>
+
+    @if (sel.cargados() && !sel.eventos().length) {
+      <div class="vacio"><mat-icon>event</mat-icon><p>Primero cree un evento en <a routerLink="/admin/eventos">Eventos</a>.</p></div>
+    } @else if (cargando()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+    } @else {
+      <p class="texto-secundario">{{ proyectos().length }} de {{ todos().length }} proyectos</p>
+      <div class="tabla-contenedor">
+        <table mat-table [dataSource]="proyectos()">
+          <ng-container matColumnDef="codigo">
+            <th mat-header-cell *matHeaderCellDef>Código</th>
+            <td mat-cell *matCellDef="let p"><strong>{{ p.codigo }}</strong></td>
+          </ng-container>
+          <ng-container matColumnDef="titulo">
+            <th mat-header-cell *matHeaderCellDef>Título</th>
+            <td mat-cell *matCellDef="let p">
+              {{ p.titulo }}
+              <div class="texto-secundario">{{ p.area.programa_nombre }} · {{ p.area.nombre }} · {{ p.autores.length }} {{ p.autores.length === 1 ? 'autor' : 'autores' }}</div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="origen">
+            <th mat-header-cell *matHeaderCellDef>Origen</th>
+            <td mat-cell *matCellDef="let p">{{ p.origen === 'SEMILLERO' ? 'Semillero' : 'Trabajo de grado' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let p">{{ p.tipo }}</td>
+          </ng-container>
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let p">{{ p.estado_nombre }}</td>
+          </ng-container>
+          <ng-container matColumnDef="jurados">
+            <th mat-header-cell *matHeaderCellDef>Jurados</th>
+            <td mat-cell *matCellDef="let p">
+              @for (j of p.jurados; track j.asignacion_id) {
+                <div class="jurado-linea">
+                  <mat-icon [class.ok]="j.evaluada" [matTooltip]="j.evaluada ? 'Ya evaluó' : 'Pendiente'">{{ j.evaluada ? 'check_circle' : 'schedule' }}</mat-icon>
+                  {{ j.nombre_completo }}
+                </div>
+              } @empty {
+                <a routerLink="/admin/asignaciones" class="texto-secundario">Asignar</a>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="evaluacion">
+            <th mat-header-cell *matHeaderCellDef>Evaluación</th>
+            <td mat-cell *matCellDef="let p"><app-estado-chip [estado]="p.estado_evaluacion" /></td>
+          </ng-container>
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let p" class="celda-acciones">
+              <a mat-icon-button [routerLink]="['/admin/proyectos', p.id]" matTooltip="Editar" aria-label="Editar proyecto"><mat-icon>edit</mat-icon></a>
+              <button mat-icon-button class="boton-peligro" (click)="eliminar(p)" [disabled]="p.tiene_evaluaciones" disabledInteractive
+                      [matTooltip]="p.tiene_evaluaciones ? 'No se puede eliminar: tiene evaluaciones enviadas' : 'Eliminar'"
+                      aria-label="Eliminar proyecto"><mat-icon>delete</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+          <tr mat-row *matRowDef="let r; columns: columnas"></tr>
+        </table>
+        @if (!proyectos().length) {
+          <div class="vacio">
+            <mat-icon>search_off</mat-icon>
+            <p>{{ todos().length ? 'Ningún proyecto coincide con los filtros.' : 'Aún no hay proyectos en este evento.' }}</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>

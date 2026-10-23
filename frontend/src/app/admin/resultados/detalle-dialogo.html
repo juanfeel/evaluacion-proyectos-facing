@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>
+  @if (proyecto(); as p) { {{ p.codigo }} · {{ p.titulo }} } @else { Evaluaciones }
+</h2>
+<mat-dialog-content>
+  @if (cargando()) {
+    <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+  } @else {
+    @if (proyecto(); as p) {
+      <section class="tarjeta identificacion">
+        <h3 class="tarjeta__encabezado">Identificación del proyecto</h3>
+        <dl class="tarjeta__cuerpo datos-lista datos-lista--4">
+          <div><dt>Código</dt><dd><strong>{{ p.codigo }}</strong></dd></div>
+          <div><dt>Origen</dt><dd>{{ p.origen_nombre }}</dd></div>
+          <div><dt>Tipo</dt><dd>{{ p.tipo_nombre }}</dd></div>
+          <div><dt>Estado</dt><dd>{{ p.estado_nombre }}</dd></div>
+          <div class="datos-lista__ancho"><dt>Título</dt><dd>{{ p.titulo }}</dd></div>
+          <div><dt>Programa</dt><dd>{{ p.area.programa_nombre }}</dd></div>
+          <div><dt>Área de conocimiento</dt><dd>{{ p.area.nombre }}</dd></div>
+        </dl>
+      </section>
+    }
+    @if (!evaluaciones().length) {
+      <p class="vacio">Este proyecto todavía no tiene evaluaciones enviadas.</p>
+    }
+    <div class="evaluaciones">
+      @for (e of evaluaciones(); track e.id; let i = $index) {
+        <section class="tarjeta">
+          <h3 class="tarjeta__encabezado">Evaluación del jurado {{ i + 1 }}</h3>
+          <p class="tarjeta__descripcion">Enviada el {{ e.enviada | date: 'd MMM y, h:mm a' }}</p>
+          <div class="tarjeta__cuerpo">
+            <h4>Asistencia de los ponentes</h4>
+            <ul class="asistencia">
+              @for (a of e.asistencias; track a.autor_id) {
+                <li><mat-icon [class.ok]="a.asistio">{{ a.asistio ? 'check_circle' : 'cancel' }}</mat-icon>
+                  {{ a.nombre_autor }} — {{ a.asistio ? 'Asistió' : 'No asistió' }}</li>
+              }
+            </ul>
+            <h4>Matriz de valoración</h4>
+            <table class="criterios">
+              <thead><tr><th>Criterio</th><th>Nivel</th><th>Puntaje</th></tr></thead>
+              <tbody>
+                @for (d of e.detalles; track d.criterio_id) {
+                  <tr>
+                    <td>{{ d.orden }}. {{ d.nombre_criterio }}</td>
+                    <td>{{ d.nivel_nombre }}</td>
+                    <td class="num">{{ d.puntaje }} / {{ d.puntaje_maximo }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <h4>Puntaje total</h4>
+            <div class="total">
+              <strong>{{ e.total }}</strong><span>/ 100</span>
+              @if (e.sin_sustentacion) { <app-estado-chip estado="SIN_SUSTENTACION" /> }
+            </div>
+            <p class="texto-secundario">{{ e.texto_umbrales }}</p>
+            <h4>Observaciones · Fortalezas del proyecto</h4>
+            <p class="observacion">{{ e.fortalezas || 'Sin observaciones.' }}</p>
+            <h4>Observaciones · Aspectos por mejorar</h4>
+            <p class="observacion">{{ e.aspectos_mejorar || 'Sin observaciones.' }}</p>
+            <h4>Datos del evaluador</h4>
+            <dl class="datos-lista">
+              <div class="datos-lista__ancho"><dt>Nombre completo</dt><dd>{{ e.jurado?.nombre_completo }}</dd></div>
+              <div><dt>Departamento académico</dt><dd>{{ e.jurado?.departamento }}</dd></div>
+              <div><dt>Fecha y hora de envío</dt><dd>{{ e.enviada | date: "d 'de' MMMM 'de' y, h:mm a" }}</dd></div>
+              <div class="datos-lista__ancho"><dt>Correo institucional</dt><dd>{{ e.jurado?.email }}</dd></div>
+            </dl>
+          </div>
+        </section>
+      }
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-flat-button mat-dialog-close><mat-icon>close</mat-icon> Cerrar</button>
+</mat-dialog-actions>

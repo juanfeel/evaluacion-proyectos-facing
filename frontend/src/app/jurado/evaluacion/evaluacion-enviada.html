@@ -1,0 +1,76 @@
+@if (evaluacion(); as e) {
+  <div class="pila-jurado">
+    <p class="aviso aviso--info"><mat-icon>lock</mat-icon>
+      <span>Evaluación enviada el {{ e.enviada | date: "d 'de' MMMM, h:mm a" }}. No se puede modificar.</span></p>
+
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>badge</mat-icon> Identificación del proyecto</h2>
+      <p class="tarjeta__descripcion">{{ e.proyecto.tipo_nombre }}</p>
+      <dl class="tarjeta__cuerpo datos-lista">
+        <div><dt>Código</dt><dd><strong>{{ e.proyecto.codigo }}</strong></dd></div>
+        <div><dt>Estado</dt><dd>{{ e.proyecto.estado_nombre }}</dd></div>
+        <div class="datos-lista__ancho"><dt>Título</dt><dd class="titulo-proyecto">{{ e.proyecto.titulo }}</dd></div>
+        <div><dt>Origen</dt><dd>{{ e.proyecto.origen_nombre }}</dd></div>
+        <div><dt>Programa</dt><dd>{{ e.proyecto.programa }}</dd></div>
+        <div class="datos-lista__ancho"><dt>Área de conocimiento</dt><dd>{{ e.proyecto.area }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>how_to_reg</mat-icon> Asistencia de los ponentes</h2>
+      <ul class="tarjeta__cuerpo lista-simple">
+        @for (a of e.asistencias; track a.autor_id) {
+          <li><mat-icon [class.ok]="a.asistio">{{ a.asistio ? 'check_circle' : 'cancel' }}</mat-icon>
+            {{ a.nombre_autor }} — {{ a.asistio ? 'Asistió' : 'No asistió' }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>grading</mat-icon> Matriz de valoración</h2>
+      <ul class="tarjeta__cuerpo criterios">
+        @for (d of e.detalles; track d.criterio_id) {
+          <li>
+            <span>{{ d.orden }}. {{ d.nombre_criterio }}<small>{{ d.nivel_nombre }}</small></span>
+            <strong>{{ d.puntaje }}<small> / {{ d.puntaje_maximo }}</small></strong>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>functions</mat-icon> Puntaje total</h2>
+      <div class="tarjeta__cuerpo">
+        <div class="total">
+          <strong>{{ e.total }}</strong><span>/ 100</span>
+          @if (e.sin_sustentacion) { <app-estado-chip estado="SIN_SUSTENTACION" /> }
+        </div>
+        <p class="texto-secundario">{{ e.texto_umbrales }}</p>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>rate_review</mat-icon> Observaciones</h2>
+      <div class="tarjeta__cuerpo">
+        <h3>Fortalezas del proyecto</h3>
+        <p class="observacion">{{ e.fortalezas || 'Sin observaciones.' }}</p>
+        <h3>Aspectos por mejorar</h3>
+        <p class="observacion">{{ e.aspectos_mejorar || 'Sin observaciones.' }}</p>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>person</mat-icon> Datos del evaluador</h2>
+      <dl class="tarjeta__cuerpo datos-lista">
+        <div class="datos-lista__ancho"><dt>Nombre completo</dt><dd>{{ e.evaluador.nombre_completo }}</dd></div>
+        <div><dt>Departamento académico</dt><dd>{{ e.evaluador.departamento }}</dd></div>
+        <div><dt>Fecha y hora de envío</dt><dd>{{ e.enviada | date: "d 'de' MMMM 'de' y, h:mm a" }}</dd></div>
+        <div class="datos-lista__ancho"><dt>Correo institucional</dt><dd>{{ e.evaluador.email }}</dd></div>
+      </dl>
+    </section>
+
+    <a mat-flat-button routerLink="/jurado" class="boton-ancho"><mat-icon>arrow_back</mat-icon> Volver a mis proyectos</a>
+  </div>
+} @else {
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+}

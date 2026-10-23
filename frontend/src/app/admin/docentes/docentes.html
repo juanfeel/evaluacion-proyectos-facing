@@ -1,0 +1,67 @@
+<section class="tarjeta">
+  <h2 class="tarjeta__encabezado"><mat-icon>groups</mat-icon> Docentes (jurados)</h2>
+  <p class="tarjeta__descripcion">La carga indica los proyectos asignados en el evento activo (máximo 3).</p>
+  <div class="tarjeta__cuerpo">
+    <div class="barra-herramientas">
+      <mat-form-field subscriptSizing="dynamic" class="buscador">
+        <mat-label>Buscar</mat-label>
+        <input matInput [value]="busqueda()" (input)="busqueda.set($any($event.target).value)" placeholder="Nombre, cédula, correo…" />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+      <span class="texto-secundario">{{ filtrados().length }} de {{ docentes().length }}</span>
+      <span class="barra-herramientas__espacio"></span>
+      <button mat-flat-button (click)="abrir()"><mat-icon>person_add</mat-icon> Registrar docente</button>
+    </div>
+    @if (cargando()) {
+      <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+    } @else if (!docentes().length) {
+      <div class="vacio"><mat-icon>group_add</mat-icon><p>No hay docentes registrados.</p></div>
+    } @else {
+      <div class="tabla-contenedor">
+        <table mat-table [dataSource]="filtrados()">
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let d">{{ d.nombre_completo }}</td>
+          </ng-container>
+          <ng-container matColumnDef="cedula">
+            <th mat-header-cell *matHeaderCellDef>Cédula</th>
+            <td mat-cell *matCellDef="let d">{{ d.cedula }}</td>
+          </ng-container>
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Correo</th>
+            <td mat-cell *matCellDef="let d">{{ d.email }}</td>
+          </ng-container>
+          <ng-container matColumnDef="departamento">
+            <th mat-header-cell *matHeaderCellDef>Departamento</th>
+            <td mat-cell *matCellDef="let d">{{ d.departamento }}</td>
+          </ng-container>
+          <ng-container matColumnDef="carga">
+            <th mat-header-cell *matHeaderCellDef>Carga</th>
+            <td mat-cell *matCellDef="let d">
+              <span class="carga" [class.carga--llena]="d.asignados >= d.max_asignaciones">{{ d.asignados }}/{{ d.max_asignaciones }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="acceso">
+            <th mat-header-cell *matHeaderCellDef>Acceso</th>
+            <td mat-cell *matCellDef="let d">
+              @if (d.debe_cambiar_password) { <app-estado-chip estado="PRIMER_INGRESO" /> }
+              @else { <span class="texto-secundario">Contraseña propia</span> }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let d" class="celda-acciones">
+              <button mat-icon-button (click)="abrir(d)" matTooltip="Editar" aria-label="Editar docente"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button (click)="restablecer(d)" matTooltip="Restablecer contraseña" aria-label="Restablecer contraseña"><mat-icon>lock_reset</mat-icon></button>
+              <button mat-icon-button class="boton-peligro" (click)="eliminar(d)" [disabled]="d.tiene_evaluaciones || d.asignados > 0"
+                      disabledInteractive [matTooltip]="motivoNoEliminar(d)" aria-label="Eliminar docente"><mat-icon>delete</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+          <tr mat-row *matRowDef="let r; columns: columnas"></tr>
+        </table>
+        @if (!filtrados().length) { <p class="vacio">Ningún docente coincide con «{{ busqueda() }}».</p> }
+      </div>
+    }
+  </div>
+</section>

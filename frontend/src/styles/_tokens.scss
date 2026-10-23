@@ -1,0 +1,57 @@
+// Identidad visual SAPIENS · Universidad de Nariño (CLAUDE.md, sección 8 "Identidad visual").
+// ÚNICO lugar donde se definen colores, sombras y tipografía. Los componentes solo usan estas variables.
+// Los hex son aproximados: cuando lleguen los valores exactos se cambian aquí y en ningún otro sitio.
+
+:root {
+  // Colores de marca
+  --color-primario: #2e7d32;
+  --color-primario-contraste: #ffffff;
+  --header-degradado-inicio: #2e6b3a;
+  --header-degradado-fin: #3f8f4c;
+  --header-texto: #ffffff;
+  --franja-oscura: #285a32;
+  --franja-ambar: #efb255;
+  --franja-texto-oscura: #ffffff;
+  --franja-texto-ambar: #3b2a06;
+  --color-acento: #e8912d;
+  --color-peligro: #d64541;
+
+  // Superficies
+  --fondo-pagina: #edf1ec;
+  --fondo-tarjeta: #ffffff;
+  --tarjeta-encabezado: #64946a;
+  --tarjeta-encabezado-texto: #ffffff;
+  --tarjeta-descripcion: #ebecf0;
+  --tarjeta-descripcion-texto: #5f6368;
+  --tarjeta-sombra: 0 1px 3px rgb(0 0 0 / 8%), 0 4px 12px rgb(0 0 0 / 6%);
+  --tarjeta-radio: 10px;
+
+  // Texto y líneas
+  --texto: #1f2a22;
+  --texto-secundario: #5f6b62;
+  --linea: #dfe4de;
+  --tabla-encabezado: #285a32;
+
+  // Estados (siempre acompañados de texto)
+  --estado-pendiente: #8a6100;
+  --estado-pendiente-fondo: #fdf1d8;
+  --estado-enviada: #1e6b2b;
+  --estado-enviada-fondo: #e1f1e3;
+  --estado-parcial: #9a4f00;
+  --estado-parcial-fondo: #fde6cc;
+  --estado-sin-jurados: #55606a;
+  --estado-sin-jurados-fondo: #e9ecef;
+  --estado-peligro: #a8322e;
+  --estado-peligro-fondo: #fbe3e2;
+
+  // Tipografía y espacios
+  --fuente: 'Roboto', system-ui, sans-serif;
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+  --espacio-6: 32px;
+  --alto-header: 64px;
+  --alto-franja: 44px;
+}

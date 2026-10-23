@@ -1,0 +1,19 @@
+.destacado__cuerpo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espacio-6); }
+.destacado__cifra { display: grid; justify-items: center; min-width: 160px;
+  strong { font-size: 64px; line-height: 1; font-weight: 700; color: var(--color-acento); }
+  span { color: var(--texto-secundario); font-size: 14px; } }
+.destacado__cifra--listo strong { color: var(--color-primario); }
+.destacado__detalle { flex: 1; min-width: 240px; display: grid; gap: var(--espacio-3); justify-items: start;
+  p { margin: 0; display: flex; align-items: center; gap: var(--espacio-2); }
+  mat-progress-bar { width: 100%; } }
+.ok { color: var(--color-primario); }
+.cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--espacio-4); }
+.cifra { display: grid; justify-items: start; gap: 2px; padding: var(--espacio-4); border-radius: var(--tarjeta-radio);
+  background: var(--fondo-tarjeta); box-shadow: var(--tarjeta-sombra); border-top: 4px solid; color: var(--texto); text-decoration: none;
+  strong { font-size: 32px; line-height: 1.1; } .cifra__texto { font-weight: 500; } .cifra__ayuda { font-size: 12px; color: var(--texto-secundario); }
+  &:hover, &:focus-visible { box-shadow: 0 0 0 2px var(--color-primario), var(--tarjeta-sombra); } }
+.cifra--sin-jurados { border-color: var(--estado-sin-jurados); .mat-icon { color: var(--estado-sin-jurados); } }
+.cifra--pendiente { border-color: var(--estado-pendiente); .mat-icon { color: var(--estado-pendiente); } }
+.cifra--parcial { border-color: var(--color-acento); .mat-icon { color: var(--estado-parcial); } }
+.cifra--evaluado { border-color: var(--color-primario); .mat-icon { color: var(--color-primario); } }
+@media (max-width: 800px) { .cifras { grid-template-columns: repeat(2, 1fr); } }

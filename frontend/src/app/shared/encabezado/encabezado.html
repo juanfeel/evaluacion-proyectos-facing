@@ -1,0 +1,44 @@
+<header class="app-header">
+  <div class="app-header__barra">
+    @if (esCelular() && navegacion().length) {
+      <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Abrir menú" class="app-header__menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        @for (item of navegacion(); track item.ruta) {
+          <a mat-menu-item [routerLink]="item.ruta" routerLinkActive="menu-activo">
+            <mat-icon>{{ item.icono }}</mat-icon>{{ item.etiqueta }}
+          </a>
+        }
+      </mat-menu>
+    }
+    <div class="app-header__marca">
+      <small>{{ contexto() }}</small>
+      <strong>{{ titulo() }}</strong>
+    </div>
+    @if (usuario()) {
+      <span class="app-header__usuario">{{ usuario() }}</span>
+    }
+    @if (mostrarSalir()) {
+      <button mat-flat-button class="boton-peligro" (click)="salir.emit()">
+        <mat-icon>logout</mat-icon> Salir
+      </button>
+    }
+  </div>
+  @if (!esCelular() && navegacion().length) {
+    <nav mat-tab-nav-bar [tabPanel]="panel" mat-stretch-tabs="false">
+      @for (item of navegacion(); track item.ruta) {
+        <a mat-tab-link [routerLink]="item.ruta" routerLinkActive #rla="routerLinkActive" [active]="rla.isActive">
+          {{ item.etiqueta }}
+        </a>
+      }
+    </nav>
+  }
+</header>
+<mat-tab-nav-panel #panel></mat-tab-nav-panel>
+@if (seccion()) {
+  <div class="franja">
+    <div class="franja__oscura"></div>
+    <h1 class="franja__titulo">{{ seccion() }}</h1>
+  </div>
+}

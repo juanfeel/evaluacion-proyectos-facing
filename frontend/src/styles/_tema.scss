@@ -1,0 +1,60 @@
+// Tema de Angular Material construido sobre los tokens. Solo modo claro.
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+
+  @include mat.theme((
+    color: (
+      primary: mat.$green-palette,
+      tertiary: mat.$orange-palette,
+      theme-type: light,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+
+  // Colores exactos de la identidad en lugar de los de la paleta generada.
+  @include mat.theme-overrides((
+    primary: var(--color-primario),
+    on-primary: var(--color-primario-contraste),
+    error: var(--color-peligro),
+    surface: var(--fondo-tarjeta),
+    on-surface: var(--texto),
+    on-surface-variant: var(--texto-secundario),
+    outline-variant: var(--linea),
+  ));
+
+  // Formularios: línea inferior y etiqueta flotante (relleno transparente).
+  @include mat.form-field-overrides((
+    filled-container-color: transparent,
+    hover-state-layer-opacity: 0,
+    focus-state-layer-opacity: 0,
+    filled-active-indicator-color: var(--linea),
+    filled-hover-active-indicator-color: var(--texto-secundario),
+    filled-focus-active-indicator-color: var(--color-primario),
+    filled-focus-label-text-color: var(--color-primario),
+  ));
+
+  // Tablas: encabezado pequeño en verde oscuro, filas con líneas finas.
+  @include mat.table-overrides((
+    header-headline-color: var(--tabla-encabezado),
+    header-headline-size: 12px,
+    header-headline-weight: 500,
+    row-item-outline-color: var(--linea),
+    background-color: var(--fondo-tarjeta),
+  ));
+
+  // Pestaña activa en naranja.
+  @include mat.tabs-overrides((
+    active-indicator-color: var(--color-acento),
+    active-focus-indicator-color: var(--color-acento),
+    active-hover-indicator-color: var(--color-acento),
+  ));
+
+  @include mat.card-overrides((
+    elevated-container-color: var(--fondo-tarjeta),
+    elevated-container-shape: var(--tarjeta-radio),
+    elevated-container-elevation: var(--tarjeta-sombra),
+  ));
+}

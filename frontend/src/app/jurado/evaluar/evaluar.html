@@ -1,0 +1,152 @@
+@if (etapa() === 'cargando') {
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando formulario" />
+} @else if (etapa() === 'enviada' && resultado(); as r) {
+  <section class="tarjeta exito" aria-live="polite">
+    <div class="exito__icono"><mat-icon>task_alt</mat-icon></div>
+    <h2>Evaluación enviada</h2>
+    <p>{{ r.proyecto.codigo }} · {{ r.proyecto.titulo }}</p>
+    <p class="exito__total"><strong>{{ r.total }}</strong> / 100</p>
+    @if (r.sin_sustentacion) { <p class="texto-secundario">Registrada sin sustentación (ningún autor asistió).</p> }
+    <div class="exito__acciones">
+      <a mat-flat-button routerLink="/jurado"><mat-icon>list</mat-icon> Volver a mis proyectos</a>
+      <a mat-stroked-button [routerLink]="['/jurado/evaluacion', r.asignacion_id]"><mat-icon>visibility</mat-icon> Ver evaluación</a>
+    </div>
+  </section>
+} @else if (formulario(); as f) {
+  <div class="formulario-evaluacion" [class.formulario-evaluacion--bloqueado]="etapa() === 'enviando'">
+    <!-- 1. Identificación del proyecto -->
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>badge</mat-icon> Identificación del proyecto</h2>
+      <p class="tarjeta__descripcion">{{ f.proyecto.tipo_nombre }}</p>
+      <dl class="tarjeta__cuerpo datos-lista">
+        <div><dt>Código</dt><dd><strong>{{ f.proyecto.codigo }}</strong></dd></div>
+        <div><dt>Estado</dt><dd>{{ f.proyecto.estado_nombre }}</dd></div>
+        <div class="datos-lista__ancho"><dt>Título</dt><dd class="titulo-proyecto">{{ f.proyecto.titulo }}</dd></div>
+        <div><dt>Origen</dt><dd>{{ f.proyecto.origen_nombre }}</dd></div>
+        <div><dt>Programa</dt><dd>{{ f.proyecto.programa }}</dd></div>
+        <div class="datos-lista__ancho"><dt>Área de conocimiento</dt><dd>{{ f.proyecto.area }}</dd></div>
+      </dl>
+    </section>
+
+    <!-- 2. Asistencia de los ponentes -->
+    <section class="tarjeta" id="asistencia">
+      <h2 class="tarjeta__encabezado"><mat-icon>how_to_reg</mat-icon> Asistencia de los ponentes</h2>
+      <div class="tarjeta__descripcion textos-asistencia">
+        <p>{{ f.asistencia_alguno }}</p>
+        <p [class.resaltado]="sinSustentacion()">{{ f.asistencia_ninguno }}</p>
+      </div>
+      <div class="tarjeta__cuerpo asistencia">
+        @for (a of f.autores; track a.id) {
+          <div class="asistencia__fila">
+            <span class="asistencia__nombre">{{ a.nombre_completo }}</span>
+            <mat-button-toggle-group class="toggle-ancho" hideSingleSelectionIndicator
+                                     [value]="asistencia()[a.id]" (change)="marcarAsistencia(a.id, $event.value)"
+                                     [attr.aria-label]="'Asistencia de ' + a.nombre_completo">
+              <mat-button-toggle [value]="true" class="toggle-si"><mat-icon>check</mat-icon> Asistió</mat-button-toggle>
+              <mat-button-toggle [value]="false" class="toggle-no"><mat-icon>close</mat-icon> No asistió</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+        }
+        @if (sinSustentacion()) {
+          <p class="aviso"><mat-icon>voice_over_off</mat-icon><span>{{ f.asistencia_ninguno }}</span></p>
+        }
+      </div>
+    </section>
+
+    <!-- 3. Matriz de valoración -->
+    <h2 class="subtitulo"><mat-icon>grading</mat-icon> Matriz de valoración</h2>
+    @if (f.nota_estado) {
+      <p class="aviso aviso--info"><mat-icon>info</mat-icon><span>{{ f.nota_estado }}</span></p>
+    }
+    @for (c of f.criterios; track c.id) {
+      <section class="tarjeta criterio" [id]="'criterio-' + c.orden">
+        <h3 class="tarjeta__encabezado criterio__encabezado">
+          <span>{{ c.orden }}. {{ c.nombre }}</span>
+          <span class="criterio__max">máx. {{ c.puntajes[c.puntajes.length - 1] }}</span>
+        </h3>
+        @if (bloqueado(c)) {
+          <p class="tarjeta__descripcion">Fijado en {{ f.niveles[0] }} porque ningún ponente se presentó.</p>
+        }
+        <div class="opciones" role="radiogroup" [attr.aria-label]="c.nombre">
+          @for (texto of c.descriptores; track $index) {
+            <button type="button" class="opcion" role="radio"
+                    [class.opcion--elegida]="efectivos()[c.id] === $index"
+                    [attr.aria-checked]="efectivos()[c.id] === $index"
+                    [disabled]="bloqueado(c) && $index !== 0"
+                    (click)="elegirNivel(c, $index)">
+              <span class="opcion__nivel">
+                <span><mat-icon class="opcion__marca">{{ efectivos()[c.id] === $index ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                  {{ f.niveles[$index] }}</span>
+                <b>{{ c.puntajes[$index] }} pts</b>
+              </span>
+              <span class="opcion__texto">{{ texto }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- 4. Puntaje total -->
+    <section class="tarjeta" id="puntaje">
+      <h2 class="tarjeta__encabezado"><mat-icon>functions</mat-icon> Puntaje total</h2>
+      <div class="tarjeta__cuerpo puntaje">
+        <p class="puntaje__valor"><strong>{{ total() }}</strong> / {{ maximo() }}</p>
+        <p class="texto-secundario">{{ f.texto_umbrales }}</p>
+      </div>
+    </section>
+
+    <!-- 5. Observaciones -->
+    <section class="tarjeta" id="observaciones">
+      <h2 class="tarjeta__encabezado"><mat-icon>rate_review</mat-icon> Observaciones</h2>
+      <p class="tarjeta__descripcion">Opcionales. Se comparten con la coordinación del evento.</p>
+      <div class="tarjeta__cuerpo formulario">
+        <mat-form-field>
+          <mat-label>Fortalezas del proyecto</mat-label>
+          <textarea matInput rows="3" maxlength="3000" [value]="fortalezas()" (input)="fortalezas.set($any($event.target).value)"></textarea>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Aspectos por mejorar</mat-label>
+          <textarea matInput rows="3" maxlength="3000" [value]="aspectos()" (input)="aspectos.set($any($event.target).value)"></textarea>
+        </mat-form-field>
+      </div>
+    </section>
+
+    <!-- 6. Datos del evaluador (reemplaza la firma; la firma equivale a confirmar el envío) -->
+    <section class="tarjeta">
+      <h2 class="tarjeta__encabezado"><mat-icon>person</mat-icon> Datos del evaluador</h2>
+      <p class="tarjeta__descripcion">Al confirmar el envío, esta evaluación queda registrada a su nombre (equivale a su firma).</p>
+      <dl class="tarjeta__cuerpo datos-lista">
+        <div class="datos-lista__ancho"><dt>Nombre completo</dt><dd>{{ auth.usuario()?.nombre_completo }}</dd></div>
+        <div><dt>Departamento académico</dt><dd>{{ auth.usuario()?.departamento }}</dd></div>
+        <div><dt>Fecha</dt><dd>{{ f.evento.fecha + 'T12:00' | date: "d 'de' MMMM 'de' y" }}</dd></div>
+        <div class="datos-lista__ancho"><dt>Correo institucional</dt><dd>{{ auth.usuario()?.email }}</dd></div>
+      </dl>
+    </section>
+
+    <div class="enviar">
+      <button mat-flat-button class="boton-ancho boton-enviar" (click)="enviar()" [disabled]="!completo() || etapa() !== 'llenando'">
+        <mat-icon>send</mat-icon> Enviar evaluación
+      </button>
+      @if (!completo()) { <p class="texto-secundario">{{ textoFaltan() }}.</p> }
+    </div>
+  </div>
+
+  <!-- 4. Total en vivo, fijo abajo -->
+  <div class="barra-total" role="status" aria-live="polite">
+    <div class="barra-total__contenido">
+      <span class="barra-total__puntaje">Total <strong>{{ total() }}</strong> / {{ maximo() }}</span>
+      @if (completo()) {
+        <span class="barra-total__listo"><mat-icon>check_circle</mat-icon> Completo</span>
+      } @else {
+        <button type="button" class="barra-total__faltan" (click)="irAPendiente()">{{ textoFaltan() }} <mat-icon>south</mat-icon></button>
+      }
+    </div>
+  </div>
+
+  @if (etapa() === 'enviando') {
+    <div class="cargando-envio" role="alert" aria-busy="true">
+      <mat-spinner diameter="48" />
+      <p>Enviando evaluación…</p>
+    </div>
+  }
+}

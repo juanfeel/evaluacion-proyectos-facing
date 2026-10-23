@@ -1,0 +1,39 @@
+@if (cargando()) {
+  <mat-progress-bar mode="indeterminate" aria-label="Cargando" />
+} @else if (!asignaciones().length) {
+  <section class="tarjeta">
+    <h2 class="tarjeta__encabezado"><mat-icon>assignment</mat-icon> Sin proyectos asignados</h2>
+    <div class="vacio"><mat-icon>inbox</mat-icon>
+      <p>Todavía no tiene proyectos asignados en el evento activo. Consulte con la coordinación.</p></div>
+  </section>
+} @else {
+  <section class="resumen" aria-live="polite">
+    <p>Hola, <strong>{{ auth.usuario()?.nombre_completo }}</strong></p>
+    @if (enviadas() === asignaciones().length) {
+      <p class="resumen__estado resumen__estado--listo"><mat-icon>task_alt</mat-icon> Evaluó todos sus proyectos. ¡Gracias!</p>
+    } @else {
+      <p class="resumen__estado">Ha evaluado <strong>{{ enviadas() }} de {{ asignaciones().length }}</strong> proyectos.</p>
+    }
+  </section>
+  <ul class="lista">
+    @for (a of ordenadas(); track a.id) {
+      <li>
+        <a class="proyecto" [class.proyecto--enviada]="a.evaluada"
+           [routerLink]="a.evaluada ? ['/jurado/evaluacion', a.id] : ['/jurado/evaluar', a.id]">
+          <span class="proyecto__cabecera">
+            <strong class="proyecto__codigo">{{ a.proyecto.codigo }}</strong>
+            <app-estado-chip [estado]="a.evaluada ? 'ENVIADA' : 'PENDIENTE'" />
+          </span>
+          <span class="proyecto__titulo">{{ a.proyecto.titulo }}</span>
+          <span class="proyecto__datos">
+            <span class="etiqueta-tipo">{{ a.proyecto.tipo }}</span>
+            {{ a.proyecto.estado_nombre }} · {{ a.proyecto.origen_nombre }}
+          </span>
+          <span class="proyecto__accion">
+            {{ a.evaluada ? 'Ver evaluación enviada' : 'Evaluar' }} <mat-icon>chevron_right</mat-icon>
+          </span>
+        </a>
+      </li>
+    }
+  </ul>
+}
